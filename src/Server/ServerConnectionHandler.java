@@ -6,6 +6,7 @@ import java.net.Socket;
 class ServerConnectionHandler implements Runnable {
 
 	Socket clientSocket = null;
+	Boolean running = true;
 	
 	public ServerConnectionHandler(Socket soc) {
 		clientSocket = soc;
@@ -16,12 +17,15 @@ class ServerConnectionHandler implements Runnable {
 		
 		try {
 			
-			GetFreePort port = new GetFreePort();
 			ConnectionManager connMan = new ConnectionManager();
 			DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
 			DataOutputStream dataOut = new DataOutputStream(clientSocket.getOutputStream());
 			
-			
+			while (running) {
+				
+				System.out.println("Here I am!");
+				
+			}
 			
 			
 		} catch(Exception except) {

@@ -27,6 +27,8 @@ public class GetFreePort {
 	        	keepGoing = false;
 	        }
         }
+        
+        System.out.println("Port number is " + localPort);
 		return localPort;
 	}
 	
