@@ -13,9 +13,22 @@ class ServerConnectionHandler implements Runnable {
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		
-		
+		try {
+			
+			GetFreePort port = new GetFreePort();
+			ConnectionManager connMan = new ConnectionManager();
+			DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
+			DataOutputStream dataOut = new DataOutputStream(clientSocket.getOutputStream());
+			
+			
+			
+			
+		} catch(Exception except) {
+			
+			System.out.println("Error in Server Connection Handler -->" + except);
+						
+		}
 		
 	}
 

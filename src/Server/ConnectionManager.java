@@ -15,8 +15,6 @@ public class ConnectionManager {
 			ServerSocket serverSoc = new ServerSocket(portNumber);
 
 			while (true){    
-				int localInt;
-				int mnPortNumber = 50001;
                 //accept incoming communication
                 Socket soc = serverSoc.accept();
 
