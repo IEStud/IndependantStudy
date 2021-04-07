@@ -7,9 +7,10 @@ import java.time.*;
 import java.util.Date;
 
 class ServerConnectionHandler implements Runnable {
-
+	int processID;
 	String inputString;
 	String dateString;
+	String leaderMessage;
 	Socket clientSocket = null;
 	Boolean running = true;
 	
@@ -21,11 +22,24 @@ class ServerConnectionHandler implements Runnable {
 	public void run() {
 
 		try {
-			
+			LeaderElection leaderElection = new LeaderElection();
 			ConnectionManager connMan = new ConnectionManager();
 			DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
 			DataOutputStream dataOut = new DataOutputStream(clientSocket.getOutputStream());
 			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyy HH:mm:ss");
+			
+			System.out.println(connMan.leaderElection);
+			
+			if(connMan.leaderElection) {
+				
+				processID = leaderElection.Run();
+				
+    			leaderMessage = "LEADERELECTION:" + Integer.toString(processID);
+    			dataOut.writeUTF(leaderMessage);
+				dataOut.flush();
+				
+				System.out.println("Message sent");
+			}
 			
 			while (running) {
 				
@@ -33,13 +47,15 @@ class ServerConnectionHandler implements Runnable {
             		inputString = "";
             		inputString = dataIn.readUTF();
             		inputString = inputString.toUpperCase();
-            		System.out.println(inputString);
             		
-            		if (inputString.startsWith("HEARTBEAT")) {           			
+            		if (inputString.startsWith("HEARTBEAT")) {  
+            			
             			Date date = new Date();
             			dateString = date.toString();
-            			dataOut.writeUTF(dateString);
-            		}
+            			dataOut.writeUTF("HEARTBEAT: " + dateString);
+            			
+            		} 
+           	  		
             	}
 				
 			}

@@ -5,6 +5,7 @@ import java.net.Socket;
 
 public class ServerWriter implements Runnable {
 
+	
     Socket swSocket = null;
     public boolean activeSession = true;
     
@@ -25,7 +26,7 @@ public class ServerWriter implements Runnable {
 			
 			while (running) {
 				
-				Thread.sleep(5000);
+				Thread.sleep(10000);
 				dataOut.writeUTF(heartbeat);
 				dataOut.flush();
 				
@@ -34,15 +35,17 @@ public class ServerWriter implements Runnable {
 			
 		} catch (Exception except) {
 			
-			System.out.println("Error in Server Writer" + except);
+			System.out.println("Beginning leader election");
+			ServerReader serverReader = new ServerReader(swSocket);
+			ServerConnectionHandler sch = new ServerConnectionHandler(swSocket);
+			ConnectionManager connMan = new ConnectionManager();
 			
-		}
-    	
-    }
-    
-    private void PerformHeartBeat() {
-    	
-    	
-    }
-	
+			serverReader.reading = false;
+			sch.running = false;
+			connMan.leaderElection = true;
+			connMan.StartUp();
+			//System.out.println("Error in Server Writer" + except);
+			
+		}	
+    }	
 }

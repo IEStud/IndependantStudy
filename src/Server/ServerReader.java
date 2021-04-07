@@ -6,8 +6,8 @@ import java.net.Socket;
 public class ServerReader implements Runnable {
 
 	Socket swSocket = null;
-	boolean restartClient = false;
 	boolean transfer = false;
+	Boolean reading = true;
 	byte[] array;
 	String filePath;
 	ServerWriter cw = new ServerWriter(null);
@@ -23,7 +23,7 @@ public class ServerReader implements Runnable {
 			
 			DataInputStream dataIn = new DataInputStream(swSocket.getInputStream());
 			DataOutputStream dataOut = new DataOutputStream(swSocket.getOutputStream());
-			Boolean reading = true;
+			
 			String dataFromServer;
 			
 			while (reading) {
@@ -32,13 +32,17 @@ public class ServerReader implements Runnable {
 					
 					dataFromServer = dataIn.readUTF();
 					
-					System.out.println("Heartbeat check: " + dataFromServer);
-					
-//					if (dataFromServer.startsWith("HEARTBEAT")) {
-//						System.out.println("Heartbeat check: " + dataFromServer);
-//					}
-				}
-			
+					if(dataFromServer.startsWith("HEARTBEAT")) {
+						
+						System.out.println("Heartbeat check: " + dataFromServer);
+						
+					}
+					if (dataFromServer.startsWith("LEADERELECTION")) {
+						
+						System.out.println("Client has received Leader Election message");
+						
+					}
+				}	
 			}
 		} catch (Exception except) {
 			
