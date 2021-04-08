@@ -1,8 +1,10 @@
 package Server;
 import java.net.*;
+import java.util.*;
 
 public class ConnectionManager {
 
+	public static ArrayList<String> PeerList = new ArrayList<String>();
 	int portNumber = 50000;	
 	String serverIP = "localhost"; 
 	int finalPort;
@@ -10,60 +12,67 @@ public class ConnectionManager {
 	boolean leaderElection = false;
 	boolean keepRunning = true;
 
-	@SuppressWarnings("resource")
-	public void StartUp() {
+	public void StartUp() {  	
+			
+		GetFreePort port = new GetFreePort();			
+		finalPort = port.GetPort(portNumber);
 		
-		try{   	
-			
-			GetFreePort port = new GetFreePort();			
-			finalPort = port.GetPort(portNumber);
-			
-			amLeader = AmLeader();
-			
-            //Setup the socket for communication 
-			ServerSocket serverSoc = new ServerSocket(portNumber);					
-			
-		    try {
-		    	
-		        //Create a new socket for communication
-		        Socket soc = new Socket(serverIP,portNumber);
-		        
-		        //create new instance of the server writer thread, initialise it and start it running
-		        ServerReader serverRead = new ServerReader(soc);
-		        Thread serverReadThread = new Thread(serverRead);
-		        serverReadThread.start();
-		        
-		        // create new instance of the server writer thread, initialise it and start it running
-		        ServerWriter serverWrite = new ServerWriter(soc);
-		        Thread serverWriteThread = new Thread(serverWrite);
-		        serverWriteThread.start();
-		        
-		        System.out.println("Server client started");
-		        
-		    } catch (Exception except){
-		        //Exception thrown (except) when something went wrong, pushing message to the console
-		        System.out.println("Error in main --> " + except.getMessage());
-		    }
-		    
-			while (keepRunning){   
-				
-				System.out.println("I'm in a loop");
-                //accept incoming communication
-                Socket soc = serverSoc.accept();
+		amLeader = AmLeader();
 
-                //create a new thread for the connection and start it
-                ServerConnectionHandler sch = new ServerConnectionHandler(soc);
-                Thread schThread = new Thread(sch);
-                schThread.start();
-                Thread.sleep(250);        
-	        }
-           
-        } catch (Exception except){
-            //Exception thrown (except) when something goes wrong, pushing message to the console
-            System.out.println("Error in Server Connection Manager--> " + except.getMessage());
-        }
-		
+    	if (amLeader) {
+    		
+    		ServerStart();
+    		
+    	} else {
+    		
+    		ServerStart();
+    		ReaderWriter();
+    		
+    	}
 	}
+	
+	
+	private void ReaderWriter () {
+		try {
+			
+	        //Create a new socket for communication
+	        Socket soc = new Socket(serverIP,portNumber);
+	        
+	        //create new instance of the server writer thread, initialise it and start it running
+	        ServerReader serverRead = new ServerReader(soc);
+	        Thread serverReadThread = new Thread(serverRead);
+	        serverReadThread.start();
+	        
+	        // create new instance of the server writer thread, initialise it and start it running
+	        ServerWriter serverWrite = new ServerWriter(soc);
+	        Thread serverWriteThread = new Thread(serverWrite);
+	        serverWriteThread.start();	      
+	        
+		} catch (Exception except) {
+			
+			System.out.println("Error in ReaderWriter --> " + except);
+			
+		}
+	}
+	
+	
+	private void ServerStart () {
+		
+		try {
+			
+			ServerSocket serverSoc = new ServerSocket(finalPort);
+			    
+	        ServerThread serverThread = new ServerThread(serverSoc);
+	        Thread servThread = new Thread(serverThread);
+	        servThread.start();
+			
+		} catch (Exception except) {
+			
+			System.out.println("Exception in ServerStart --> " + except);
+			
+		}		
+	}
+	
 	
 	private Boolean AmLeader( ) {
 		
@@ -71,8 +80,7 @@ public class ConnectionManager {
 			
 			return true;
 			
-		}
-		else {
+		} else {
 		
 			return false;
 			

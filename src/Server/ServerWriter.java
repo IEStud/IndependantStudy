@@ -5,7 +5,6 @@ import java.net.Socket;
 
 public class ServerWriter implements Runnable {
 
-	
     Socket swSocket = null;
     public boolean activeSession = true;
     

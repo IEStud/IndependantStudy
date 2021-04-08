@@ -22,7 +22,6 @@ public class ServerReader implements Runnable {
 		try {
 			
 			DataInputStream dataIn = new DataInputStream(swSocket.getInputStream());
-			DataOutputStream dataOut = new DataOutputStream(swSocket.getOutputStream());
 			
 			String dataFromServer;
 			

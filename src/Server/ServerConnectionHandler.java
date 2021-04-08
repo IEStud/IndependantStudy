@@ -2,8 +2,6 @@ package Server;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
-import java.time.*;
 import java.util.Date;
 
 class ServerConnectionHandler implements Runnable {
@@ -26,8 +24,6 @@ class ServerConnectionHandler implements Runnable {
 			ConnectionManager connMan = new ConnectionManager();
 			DataInputStream dataIn = new DataInputStream(clientSocket.getInputStream());
 			DataOutputStream dataOut = new DataOutputStream(clientSocket.getOutputStream());
-			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyy HH:mm:ss");
-			
 			System.out.println(connMan.leaderElection);
 			
 			if(connMan.leaderElection) {
@@ -53,20 +49,15 @@ class ServerConnectionHandler implements Runnable {
             			Date date = new Date();
             			dateString = date.toString();
             			dataOut.writeUTF("HEARTBEAT: " + dateString);
+            			dataOut.flush();
             			
-            		} 
-           	  		
-            	}
-				
-			}
-			
-			
+            		}            	  		
+            	}				
+			}						
 		} catch(Exception except) {
 			
 			System.out.println("Error in Server Connection Handler -->" + except);
 						
-		}
-		
+		}		
 	}
-
 }
