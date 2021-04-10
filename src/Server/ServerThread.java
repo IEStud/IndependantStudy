@@ -25,7 +25,7 @@ public class ServerThread implements Runnable {
 		        ServerConnectionHandler sch = new ServerConnectionHandler(soc);
 		        Thread schThread = new Thread(sch);
 		        schThread.start();
-		        Thread.sleep(250);       
+     
 		    }
 			
 		} catch (Exception except) {

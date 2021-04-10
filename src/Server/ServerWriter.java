@@ -5,8 +5,8 @@ import java.net.Socket;
 
 public class ServerWriter implements Runnable {
 
-    Socket swSocket = null;
-    public boolean activeSession = true;
+    Socket swSocket = null; 
+    boolean running = true;
     
     public ServerWriter (Socket outputSoc){
         swSocket = outputSoc;
@@ -18,33 +18,34 @@ public class ServerWriter implements Runnable {
 		try {
 			
 			DataOutputStream dataOut = new DataOutputStream(swSocket.getOutputStream());
-			Boolean running = true;
+			
 			String heartbeat = "HEARTBEAT";
-			
-			System.out.println("Starting loop");
-			
+			String connect = "CONNECT:";
+
 			while (running) {
 				
-				Thread.sleep(10000);
-				dataOut.writeUTF(heartbeat);
-				dataOut.flush();
-				
+				if (ConnectionManager.swFirstRun) {
+					String temp = connect + ConnectionManager.finalPort;
+					dataOut.writeUTF(temp);
+					dataOut.flush();
+					ConnectionManager.swFirstRun = false;
+					running = false;
+				} else {
+					//Sends a heart beat check to the current leader every 10 seconds	
+					
+					if (swSocket.getPort() == 50000) {
+						Thread.sleep(15000);
+						dataOut.writeUTF(heartbeat);
+						dataOut.flush();
+					}
+				}
 			}
 			
 			
 		} catch (Exception except) {
+		
+			System.out.println("Error in Server Writer" + except);
 			
-			System.out.println("Beginning leader election");
-			ServerReader serverReader = new ServerReader(swSocket);
-			ServerConnectionHandler sch = new ServerConnectionHandler(swSocket);
-			ConnectionManager connMan = new ConnectionManager();
-			
-			serverReader.reading = false;
-			sch.running = false;
-			connMan.leaderElection = true;
-			connMan.StartUp();
-			//System.out.println("Error in Server Writer" + except);
-			
-		}	
-    }	
+		}
+	}	 
 }

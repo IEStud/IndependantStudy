@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.Socket;
 
 public class ServerReader implements Runnable {
-
+	
 	Socket swSocket = null;
 	boolean transfer = false;
 	Boolean reading = true;
@@ -21,33 +21,28 @@ public class ServerReader implements Runnable {
 		
 		try {
 			
-			DataInputStream dataIn = new DataInputStream(swSocket.getInputStream());
-			
+			DataInputStream dataIn = new DataInputStream(swSocket.getInputStream());			
 			String dataFromServer;
+			
 			
 			while (reading) {
 				
 				if (dataIn.available() > 0) {
-					
 					dataFromServer = dataIn.readUTF();
 					
+					//This prints out the heart beat check
 					if(dataFromServer.startsWith("HEARTBEAT")) {
 						
-						System.out.println("Heartbeat check: " + dataFromServer);
+						System.out.println("SR: " + dataFromServer + ":" + swSocket.getPort());
 						
 					}
-					if (dataFromServer.startsWith("LEADERELECTION")) {
-						
-						System.out.println("Client has received Leader Election message");
-						
+					if (dataFromServer.startsWith("REBOOT" )) {
+						reading = false;
 					}
-				}	
-			}
-		} catch (Exception except) {
-			
-			System.out.println("Error in Server Reader" + except);
-			
+				}			
+			}				
+		} catch (Exception except) {			
+			System.out.println("Error in Server Reader" + except);			
 		}
-		
 	}
 }
