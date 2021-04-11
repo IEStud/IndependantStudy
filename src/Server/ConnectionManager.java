@@ -13,7 +13,7 @@ public class ConnectionManager {
 	static boolean amLeader;
 	boolean leaderElection = false;
 	boolean keepRunning = true;
-	static boolean swFirstRun = true;
+//	static boolean swFirstRun = true;
 
 	public void StartUp() throws InterruptedException {  	
 		
@@ -21,21 +21,21 @@ public class ConnectionManager {
 		GetFreePort port = new GetFreePort();
 		PeerList.add(portNumber);
 		finalPort = port.GetPort(portNumber);	
-		int count = 0;
-		int numberOfPeers =  finalPort - portNumber;
-		int finalCount = 0;
-		boolean finished = false;
-			
-		while (!finished) {						
-			count++;				
-			if (count >= numberOfPeers) {					
-				finished = true;				
-			} else {				
-				//This line of code gets the port number 
-				finalCount = portNumber + count;				
-				PeerList.add(finalCount);
-			}
-		}		
+//		int count = 0;
+//		int numberOfPeers =  finalPort - portNumber;
+//		int finalCount = 0;
+//		boolean finished = false;
+//			
+//		while (!finished) {						
+//			count++;				
+//			if (count >= numberOfPeers) {					
+//				finished = true;				
+//			} else {				
+//				//This line of code gets the port number 
+//				finalCount = portNumber + count;				
+//				PeerList.add(finalCount);
+//			}
+//		}		
 		
 		amLeader = AmLeader();
     	if (amLeader) {
@@ -44,26 +44,27 @@ public class ConnectionManager {
     	} else {    		
     		//If the node is not the leader, it will start its server and client threads
     		ServerStart();
-    		ConnectToPeer();
+    		ReaderWriter(portNumber);
+    		//ConnectToPeer();
     	}
 	}
 	
-	public static void Reboot() throws InterruptedException {
-		ConnectToPeer();
-	}
-	
-	private static void ConnectToPeer () throws InterruptedException {
-	
-		//This section of code is working, the second list carries the correct number of peers
-		
-		SecondList = PeerList.stream().distinct().collect(Collectors.toList());		
-		SecondList.remove(new Integer(finalPort));
-		
-		for (int portyPort: SecondList) {
-			Thread.sleep(500);
-			ReaderWriter(portyPort);
-		}
-	}
+//	public static void Reboot() throws InterruptedException {
+//		ConnectToPeer();
+//	}
+//	
+//	private static void ConnectToPeer () throws InterruptedException {
+//	
+//		//This section of code is working, the second list carries the correct number of peers
+//		
+//		SecondList = PeerList.stream().distinct().collect(Collectors.toList());		
+//		SecondList.remove(new Integer(finalPort));
+//		
+//		for (int portyPort: SecondList) {
+//			Thread.sleep(500);
+//			ReaderWriter(portyPort);
+//		}
+//	}
 	
 	private static void ReaderWriter (int port) {
 		try {

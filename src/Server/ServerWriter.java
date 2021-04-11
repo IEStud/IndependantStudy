@@ -7,6 +7,7 @@ public class ServerWriter implements Runnable {
 
     Socket swSocket = null; 
     boolean running = true;
+    boolean swFirstRun = true;
     
     public ServerWriter (Socket outputSoc){
         swSocket = outputSoc;
@@ -24,19 +25,20 @@ public class ServerWriter implements Runnable {
 
 			while (running) {
 				
-				if (ConnectionManager.swFirstRun) {
+				if (swFirstRun) {
 					String temp = connect + ConnectionManager.finalPort;
 					dataOut.writeUTF(temp);
 					dataOut.flush();
-					ConnectionManager.swFirstRun = false;
-					running = false;
+					swFirstRun = false;
+					//running = false;
 				} else {
 					//Sends a heart beat check to the current leader every 10 seconds	
 					
 					if (swSocket.getPort() == 50000) {
-						Thread.sleep(15000);
+						Thread.sleep(10000);
 						dataOut.writeUTF(heartbeat);
 						dataOut.flush();
+						System.out.println("SW: Heartbeat sent");
 					}
 				}
 			}
