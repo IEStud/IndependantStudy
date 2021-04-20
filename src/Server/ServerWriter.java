@@ -8,6 +8,9 @@ public class ServerWriter implements Runnable {
     Socket swSocket = null; 
     boolean running = true;
     boolean swFirstRun = true;
+    static boolean electionRunning = true;
+    int processID;
+    
     
     public ServerWriter (Socket outputSoc){
         swSocket = outputSoc;
@@ -22,32 +25,55 @@ public class ServerWriter implements Runnable {
 			
 			String heartbeat = "HEARTBEAT";
 			String connect = "CONNECT:";
-
-			while (running) {
+			String election = "ELECTION";
+			String complete = "COMPLETE";
+			
+			if (ConnectionManager.leaderFlag) {
 				
-				if (swFirstRun) {
-					String temp = connect + ConnectionManager.finalPort;
-					dataOut.writeUTF(temp);
-					dataOut.flush();
-					swFirstRun = false;
-					//running = false;
-				} else {
-					//Sends a heart beat check to the current leader every 10 seconds	
-					
-					if (swSocket.getPort() == 50000) {
-						Thread.sleep(10000);
-						dataOut.writeUTF(heartbeat);
-						dataOut.flush();
-						System.out.println("SW: Heartbeat sent");
+				dataOut.writeUTF(election);
+				Thread.sleep(5000);
+				dataOut.writeUTF(election + ":" + ConnectionManager.finalPort + ":" + ConnectionManager.processID);
+				dataOut.flush();
+
+			} 
+			if (ConnectionManager.electionComplete) {
+				
+				dataOut.writeUTF(complete);
+			
+			} else {
+			
+				while (running) {
+					//Checks to see if there is an election in progress
+					if (!ConnectionManager.leaderFlag) { 
+						if (swFirstRun) {
+							String temp = connect + ConnectionManager.finalPort;
+							dataOut.writeUTF(temp);
+							dataOut.flush();
+							swFirstRun = false;
+						} else {
+							//Sends a heart beat check to the current leader every 10 seconds						
+							if (swSocket.getPort() == 50000) {
+								Thread.sleep(10000);
+								dataOut.writeUTF(heartbeat);
+								dataOut.flush();
+							}
+						}
+					} else if (ConnectionManager.leaderFlag){						
+						running = false;
+						//System.out.println("Starting leader election");
+						ConnectionManager.ConnectToPeer();
 					}
 				}
 			}
-			
-			
 		} catch (Exception except) {
-		
-			System.out.println("Error in Server Writer" + except);
-			
+			if (swSocket.getPort() == 50000) {
+				ConnectionManager.leaderFlag = true;
+				ConnectionManager.ConnectToPeer();
+			} else {
+				
+				System.out.println("Error in server writer -> " + except);
+				
+			}
 		}
 	}	 
 }
