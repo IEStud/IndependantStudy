@@ -8,7 +8,6 @@ public class ServerWriter implements Runnable {
     Socket swSocket = null; 
     boolean running = true;
     boolean swFirstRun = true;
-    static boolean electionRunning = true;
     int processID;
     
     
@@ -26,7 +25,14 @@ public class ServerWriter implements Runnable {
 			String heartbeat = "HEARTBEAT";
 			String connect = "CONNECT:";
 			String election = "ELECTION";
+			String complete = "COMPLETE";
 			
+			if(ConnectionManager.electionComplete) {
+				dataOut.writeUTF(complete);
+				dataOut.flush();
+				ConnectionManager.electionComplete = false;
+				System.out.println("Complete message sent");
+			}
 			if (ConnectionManager.leaderFlag) {
 				
 				dataOut.writeUTF(election);

@@ -52,6 +52,7 @@ class ServerConnectionHandler implements Runnable {
 	            					if (result == 1) {	            						
 	            						dataOut.writeUTF("EXIT");
 	            						dataOut.flush();
+	            						System.out.println("Exit sent");
 	            						ServerReader.reading = false;
 	            						
 	            						if (ConnectionManager.numberOfFlushes == ConnectionManager.SecondList.size()) {
@@ -60,12 +61,16 @@ class ServerConnectionHandler implements Runnable {
 	            							ConnectionManager.StartUp();
 	            						}
 	            					} else {
-	            						ServerReader.reading = false;
+	            						
+	            						////////////////////////////
+	            						System.out.println("Retiring from election");
+	        							ConnectionManager.leaderFlag = false;
+	        							ServerReader.reading = false;
 	            					}
 	            				}
 	            			}	            			 
 	            		}	
-            		}						
+            		}		
 				} else {
 				 
 	            	if (dataIn.available() != 0) {
@@ -101,7 +106,7 @@ class ServerConnectionHandler implements Runnable {
 	            			ConnectionManager.leaderFlag = true;
 	            		}
 	            		if (inputString.startsWith("COMPLETE")) {
-
+	            			System.out.println("COMPLETE message received");
 	            		}
 	            	}				
 				}	
