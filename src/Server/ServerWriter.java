@@ -27,13 +27,15 @@ public class ServerWriter implements Runnable {
 			String election = "ELECTION";
 			String complete = "COMPLETE";
 			
-			if(ConnectionManager.electionComplete) {
+			if (ConnectionManager.electionComplete) {
+				System.out.println("Waiting for complete message send");
+				Thread.sleep(10000);
 				dataOut.writeUTF(complete);
 				dataOut.flush();
 				ConnectionManager.electionComplete = false;
 				System.out.println("Complete message sent");
-			}
-			if (ConnectionManager.leaderFlag) {
+				
+			} else if (ConnectionManager.leaderFlag) {
 				
 				dataOut.writeUTF(election);
 				Thread.sleep(5000);
@@ -51,7 +53,8 @@ public class ServerWriter implements Runnable {
 							dataOut.flush();
 							swFirstRun = false;
 						} else {
-							//Sends a heart beat check to the current leader every 10 seconds						
+							//Sends a heart beat check to the current leader every 10 seconds		
+							
 							if (swSocket.getPort() == 50000) {
 								Thread.sleep(10000);
 								dataOut.writeUTF(heartbeat);

@@ -25,7 +25,7 @@ public class ServerReader implements Runnable {
 			String dataFromServer;
 			
 			if (ConnectionManager.amLeader) {
-				
+
 				reading = false;
 				
 			}
@@ -69,7 +69,7 @@ public class ServerReader implements Runnable {
 						dataFromServer = dataIn.readUTF();
 						
 						if(dataFromServer.startsWith("EXIT")) {
-							System.out.println("Retiring from election");
+							System.out.println("Retiring from election in Reader");
 							ConnectionManager.leaderFlag = false;
 							reading = false;
 						}			

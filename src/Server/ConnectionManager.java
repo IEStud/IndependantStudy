@@ -61,6 +61,12 @@ public class ConnectionManager {
 		}	
 	}
 	
+	public static void Reboot () {
+		ServerReader.reading = true;
+		ReaderWriter(portNumber);
+		
+	}
+	
 	private static void ReaderWriter (int port) {
 		try {
 			
@@ -76,7 +82,9 @@ public class ConnectionManager {
 	        ServerWriter serverWrite = new ServerWriter(soc);
 	        Thread serverWriteThread = new Thread(serverWrite);
 	        serverWriteThread.start();
-	        System.out.println("Connected to server on port " + port + "; and I am " + finalPort);
+	        
+	        //System.out.println("Connected to server on port " + port + "; and I am " + finalPort);
+	        
 		} catch (Exception except) {
 			
 			System.out.println("Error in ReaderWriter --> " + except);

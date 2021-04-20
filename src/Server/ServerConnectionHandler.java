@@ -4,18 +4,24 @@ import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 class ServerConnectionHandler implements Runnable {
 	List<Integer> SecondList = new ArrayList<Integer>();
 	int processID;
 	int numberSent = 0;
+	long startTime;
+	long currentTime;
+	long difference;
 	String inputString;
 	String dateString;
 	String leaderMessage;
 	Socket clientSocket = null;
 	boolean running = true;
 	boolean reboot = false;
+	boolean justFinished = false;
+	boolean flushSent = false;
 	
 	public ServerConnectionHandler(Socket soc) {
 		clientSocket = soc;
@@ -31,52 +37,72 @@ class ServerConnectionHandler implements Runnable {
 			while (running) {
 				
 				if(ConnectionManager.leaderFlag) {
-				
-					if (dataIn.available() != 0) { 
-						inputString = "";
-	            		inputString = dataIn.readUTF();
-	            		inputString = inputString.toUpperCase();
-	            			            		
-	            		if(inputString.startsWith("ELECTION")) {
-	            			String[] stringArray = inputString.split(":");
-	            			
-	            			for (String port: stringArray) {
-	            				
-	            				if (port.contains("5000")) {
-	            					int add = Integer.parseInt(stringArray[2]);         					
-	            					int result = 0; 
-	            					result = LeaderElection.Check(add);
-	            					
-	            					System.out.println("Process ID received is " + add + " my process ID is " + ConnectionManager.processID);
-	            					
-	            					if (result == 1) {	            						
-	            						dataOut.writeUTF("EXIT");
-	            						dataOut.flush();
-	            						System.out.println("Exit sent");
-	            						ServerReader.reading = false;
-	            						
-	            						if (ConnectionManager.numberOfFlushes == ConnectionManager.SecondList.size()) {
-	            							ConnectionManager.leaderFlag = false;
-	            							ConnectionManager.electionComplete = true;
-	            							ConnectionManager.StartUp();
-	            						}
-	            					} else {
-	            						
-	            						////////////////////////////
-	            						System.out.println("Retiring from election");
-	        							ConnectionManager.leaderFlag = false;
-	        							ServerReader.reading = false;
-	            					}
-	            				}
-	            			}	            			 
+		
+					if (justFinished) {
+					
+						ConnectionManager.leaderFlag = false;
+						
+					} else {
+						
+						if (flushSent) {
+							currentTime = System.currentTimeMillis();
+							difference = currentTime - startTime;
+							
+							if (difference > 10000) {
+								System.out.println("the difference is real");
+							}
+						}
+						
+						if (dataIn.available() != 0) { 
+							inputString = "";
+		            		inputString = dataIn.readUTF();
+		            		inputString = inputString.toUpperCase();
+		            		
+		            		if(inputString.startsWith("ELECTION")) {
+		            			String[] stringArray = inputString.split(":");
+		            			
+		            			for (String port: stringArray) {
+		            				
+		            				if (port.contains("5000")) {
+		            					int add = Integer.parseInt(stringArray[2]);         					
+		            					int result = 0; 
+		            					result = LeaderElection.Check(add);
+		            					
+		            					//System.out.println("Process ID received is " + add + " my process ID is " + ConnectionManager.processID);
+		            					
+		            					if (result == 1) {	            						
+		            						dataOut.writeUTF("EXIT");
+		            						dataOut.flush();
+		            						System.out.println("Exit sent");
+		            						
+		            						startTime = System.currentTimeMillis();
+		            						System.out.println("The current time is " + startTime);
+		            						flushSent = true;
+		            						if (ConnectionManager.numberOfFlushes == ConnectionManager.SecondList.size()) {
+		            							ConnectionManager.leaderFlag = false;
+		            							ConnectionManager.electionComplete = true;
+		            							ConnectionManager.StartUp();
+		            						}
+		            					} else {
+		            						
+		            						System.out.println("Retiring from election in Server with process ID " + ConnectionManager.processID);
+		        							ConnectionManager.leaderFlag = false;
+		        							ServerReader.reading = false;
+		        							justFinished = true;
+		            					}
+		            				}
+		            			}	            			 
+		            		}			            		
 	            		}	
-            		}		
+					}
 				} else {
 				 
 	            	if (dataIn.available() != 0) {
 	            		inputString = "";
 	            		inputString = dataIn.readUTF();
 	            		inputString = inputString.toUpperCase();
+	            		
+	            		System.out.println(inputString);
 	            		
 	            		//This first statement parses the port number presented after the CONNECT and stores it
 	            		if (inputString.startsWith("CONNECT")) {            			
@@ -106,7 +132,9 @@ class ServerConnectionHandler implements Runnable {
 	            			ConnectionManager.leaderFlag = true;
 	            		}
 	            		if (inputString.startsWith("COMPLETE")) {
-	            			System.out.println("COMPLETE message received");
+	            			System.out.println("Beginning reboot...");
+	            			justFinished = false;
+	            			ConnectionManager.Reboot();
 	            		}
 	            	}				
 				}	

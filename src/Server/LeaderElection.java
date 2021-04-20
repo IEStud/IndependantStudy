@@ -26,6 +26,8 @@ public class LeaderElection {
 	
 	public static int Check(int num) {
 		
+		System.out.println("Checking number " + num);
+		
 		if (ConnectionManager.processID > num) {
 			ConnectionManager.numberOfFlushes++;
 			return 1;
