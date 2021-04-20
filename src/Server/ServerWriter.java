@@ -26,7 +26,6 @@ public class ServerWriter implements Runnable {
 			String heartbeat = "HEARTBEAT";
 			String connect = "CONNECT:";
 			String election = "ELECTION";
-			String complete = "COMPLETE";
 			
 			if (ConnectionManager.leaderFlag) {
 				
@@ -35,11 +34,6 @@ public class ServerWriter implements Runnable {
 				dataOut.writeUTF(election + ":" + ConnectionManager.finalPort + ":" + ConnectionManager.processID);
 				dataOut.flush();
 
-			} 
-			if (ConnectionManager.electionComplete) {
-				
-				dataOut.writeUTF(complete);
-			
 			} else {
 			
 				while (running) {
@@ -60,7 +54,6 @@ public class ServerWriter implements Runnable {
 						}
 					} else if (ConnectionManager.leaderFlag){						
 						running = false;
-						//System.out.println("Starting leader election");
 						ConnectionManager.ConnectToPeer();
 					}
 				}

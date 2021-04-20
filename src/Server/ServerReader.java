@@ -24,11 +24,11 @@ public class ServerReader implements Runnable {
 			DataInputStream dataIn = new DataInputStream(swSocket.getInputStream());			
 			String dataFromServer;
 			
-			if (ConnectionManager.amLeader) {
-				
-				reading = false;
-				
-			}
+//			if (ConnectionManager.amLeader) {
+//				
+//				reading = false;
+//				
+//			}
 						
 			while (reading) {
 				//Checks to see if there is a leader election in progress
@@ -72,10 +72,10 @@ public class ServerReader implements Runnable {
 						dataFromServer = dataIn.readUTF();
 						
 						if(dataFromServer.startsWith("EXIT")) {
+							System.out.println("Retiring from election");
 							ServerWriter.electionRunning = false;
 							ConnectionManager.leaderFlag = false;
 							reading = false;
-							System.out.println("Retiring from election");
 						}	
 					}
 				}

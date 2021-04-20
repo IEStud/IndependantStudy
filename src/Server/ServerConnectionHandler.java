@@ -101,7 +101,7 @@ class ServerConnectionHandler implements Runnable {
 	            			ConnectionManager.leaderFlag = true;
 	            		}
 	            		if (inputString.startsWith("COMPLETE")) {
-	            			
+
 	            		}
 	            	}				
 				}	

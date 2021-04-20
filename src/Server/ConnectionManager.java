@@ -29,12 +29,6 @@ public class ConnectionManager {
     	if (amLeader) {
     		//If the node is the leader, it will only start up its server side
     		ServerStart(); 
-    		
-    		if (electionComplete) {
-    			ConnectToPeer();
-    			
-    			electionComplete = false;
-    		}
     				
     	} else {    		
     		//If the node is not the leader, it will start its server and client threads		
