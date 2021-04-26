@@ -7,7 +7,7 @@ public class ServerWriter implements Runnable {
 
     Socket swSocket = null; 
     boolean running = true;
-    boolean swFirstRun = true;
+    static boolean swFirstRun = true;
     int processID;
     
     
@@ -22,20 +22,28 @@ public class ServerWriter implements Runnable {
 			
 			DataOutputStream dataOut = new DataOutputStream(swSocket.getOutputStream());
 			
-			String heartbeat = "HEARTBEAT";
+			String heartbeat = "HEARTBEAT:";
 			String connect = "CONNECT:";
 			String election = "ELECTION";
 			String complete = "COMPLETE";
 			
+//			if (ConnectionManager.election) {
+//				ConnectionManager.leaderFlag = true;
+//				System.out.println("The leader flag is " + ConnectionManager.leaderFlag);
+//			}
+			
 			if (ConnectionManager.electionComplete) {
 				System.out.println("Waiting for complete message send");
+				//Clear the peer list below to get a fresh list of online nodes
+				ConnectionManager.PeerList.clear();
 				Thread.sleep(10000);
 				dataOut.writeUTF(complete);
 				dataOut.flush();
 				ConnectionManager.electionComplete = false;
 				System.out.println("Complete message sent");
 				
-			} else if (ConnectionManager.leaderFlag) {
+			}  
+			if (ConnectionManager.leaderFlag) {
 				
 				dataOut.writeUTF(election);
 				Thread.sleep(5000);
@@ -57,8 +65,10 @@ public class ServerWriter implements Runnable {
 							
 							if (swSocket.getPort() == 50000) {
 								Thread.sleep(10000);
-								dataOut.writeUTF(heartbeat);
+								dataOut.writeUTF(heartbeat + ConnectionManager.finalPort);
 								dataOut.flush();
+								ConnectionManager.electionComplete = false;
+								
 							}
 						}
 					} else if (ConnectionManager.leaderFlag){						
@@ -68,9 +78,13 @@ public class ServerWriter implements Runnable {
 				}
 			}
 		} catch (Exception except) {
+			
 			if (swSocket.getPort() == 50000) {
+				System.out.println("Starting leader election...");
 				ConnectionManager.leaderFlag = true;
+				System.out.println("Leader flag is " + ConnectionManager.leaderFlag);
 				ConnectionManager.ConnectToPeer();
+				
 			} else {
 				
 				System.out.println("Error in server writer -> " + except);

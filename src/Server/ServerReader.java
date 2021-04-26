@@ -3,7 +3,6 @@ package Server;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +28,11 @@ public class ServerReader implements Runnable {
 				reading = false;
 				
 			}
+			
+//			if (ConnectionManager.election) {
+//				ConnectionManager.leaderFlag = true;
+//				System.out.println("The Leader flag is " + ConnectionManager.leaderFlag);
+//			}
 						
 			while (reading) {
 				//Checks to see if there is a leader election in progress
@@ -41,11 +45,9 @@ public class ServerReader implements Runnable {
 						//This prints out the heart beat check
 						if(dataFromServer.startsWith("HEARTBEAT")) {
 							String [] stringArray = dataFromServer.split(":");
-	            			Date date = new Date();
-	            			String dateString = date.toString();
-							int add;
+	            			int add;
 							int result;
-	            			
+	            			ConnectionManager.PeerList.clear();
 							for (String entry: stringArray) {
 								
 								if (entry.contains("5000")) {
@@ -58,12 +60,15 @@ public class ServerReader implements Runnable {
 									}
 								}
 							}							
-							System.out.println("HEARTBEAT received on " + dateString);
+							System.out.println("HEARTBEAT : The Leader Flag is " + ConnectionManager.leaderFlag + " : And the Election boolean is " + ConnectionManager.electionComplete);
+						}
+						if (dataFromServer.startsWith("ELECTION")) {
+							ConnectionManager.leaderFlag = true;
 						}
 					}			
 				} 
 				if (ConnectionManager.leaderFlag) {
-									
+					
 					if (dataIn.available() > 0) {											
 						
 						dataFromServer = dataIn.readUTF();

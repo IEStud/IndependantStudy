@@ -6,24 +6,28 @@ import java.util.stream.Collectors;
 public class ConnectionManager {
 
 	public static ArrayList<Integer> PeerList = new ArrayList<Integer>();
-	public static ArrayList<Integer> ElectionList = new ArrayList<Integer>();
+	public static ArrayList<Integer> TempList = new ArrayList<Integer>();
 	static List<Integer> SecondList = new ArrayList<Integer>();
 	static int portNumber = 50000;	
 	static int processID;
 	static int numberOfFlushes = 0;
+	static int oldPortNumber;
 	static String serverIP = "localhost"; 
 	public static int finalPort;
 	static boolean amLeader;
 	static boolean leaderFlag = false;
 	static boolean electionComplete = false;
+	static boolean already = false;
+	static boolean election = false;
+	
 
 	public static void StartUp() throws InterruptedException {  	
-		
+		boolean running = true;
 		//GetFreePort tests ports from 50000 and up to find out which one is available
 		GetFreePort port = new GetFreePort();
 		PeerList.add(portNumber);
 		finalPort = port.GetPort(portNumber);		
-		
+		oldPortNumber = finalPort;
 		amLeader = AmLeader();
 		
     	if (amLeader) {
@@ -32,11 +36,14 @@ public class ConnectionManager {
     		
     		if (electionComplete) {
     			
+    			election = false;
+    			
     			for (int newPort: SecondList) {
     			
     				ReaderWriter(newPort);
     				
     			}
+    			
     		}
     				
     	} else {    		
@@ -44,25 +51,42 @@ public class ConnectionManager {
     		ServerStart();
     		ReaderWriter(portNumber);
     	}
+    	
+    	if (amLeader) {
+	    	while (running) {
+	    		if (!leaderFlag) {
+	    			
+	    			Thread.sleep(12000);
+	    			UpdatePortList();
+	    			
+	    		} else if (leaderFlag) {
+	    			running = false;
+	    		}
+	    	}
+    	}
 	}
 	
 	
 	public static void ConnectToPeer () {
+		SecondList.clear();
+		SecondList = ConnectionManager.PeerList.stream().distinct().collect(Collectors.toList()); //Copies the peer list over to a secondary list		
+		SecondList.remove(new Integer(ConnectionManager.finalPort)); //Removes the leader port number "50000"
+		SecondList.remove(new Integer(portNumber)); //Removes it's own portnumber
+		LeaderElection.Run(); //Generates it's own process ID
+		election = true;
 		
-		SecondList = ConnectionManager.PeerList.stream().distinct().collect(Collectors.toList());		
-		SecondList.remove(new Integer(ConnectionManager.finalPort));
-		SecondList.remove(new Integer(portNumber));
-		LeaderElection.Run();
-
 		for (int port: SecondList) {
-			
 			ReaderWriter(port);
-			
 		}	
+		System.out.println("Connected to peers " + SecondList);
 	}
 	
 	public static void Reboot () {
 		ServerReader.reading = true;
+		LeaderElection.firstRun = true;
+		election = false;
+		leaderFlag = false;
+		ServerConnectionHandler.justFinished = false;
 		ReaderWriter(portNumber);
 		
 	}
@@ -83,11 +107,11 @@ public class ConnectionManager {
 	        Thread serverWriteThread = new Thread(serverWrite);
 	        serverWriteThread.start();
 	        
-	        //System.out.println("Connected to server on port " + port + "; and I am " + finalPort);
+	        System.out.println("Connected to server on port " + port + "; and I am " + finalPort);
 	        
 		} catch (Exception except) {
-			
-			System.out.println("Error in ReaderWriter --> " + except);
+
+			System.out.println("Error in ReaderWriter -> " + except);
 			
 		}
 	}
@@ -110,6 +134,14 @@ public class ConnectionManager {
 			System.out.println("Exception in ServerStart --> " + except);
 			
 		}		
+	}
+	
+	public static void UpdatePortList () {
+		PeerList.clear();
+		PeerList = (ArrayList<Integer>) TempList.stream().distinct().collect(Collectors.toList());	
+		System.out.println("List updated" + PeerList);
+		
+		TempList.clear();
 	}
 
 	//This class runs a simple check to see if this node is the leader in the P2P network
