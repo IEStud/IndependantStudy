@@ -20,6 +20,7 @@ public class ConnectionManager {
 	static boolean already = false;
 	static boolean election = false;
 	
+	
 
 	public static void StartUp() throws InterruptedException {  	
 		boolean running = true;
@@ -29,6 +30,8 @@ public class ConnectionManager {
 		finalPort = port.GetPort(portNumber);		
 		oldPortNumber = finalPort;
 		amLeader = AmLeader();
+		
+		
 		
     	if (amLeader) {
     		//If the node is the leader, it will only start up its server side
