@@ -6,7 +6,7 @@ import java.net.Socket;
 public class ServerWriter implements Runnable {
 
     Socket swSocket = null; 
-    boolean running = true;
+    static boolean running = true;
     static boolean swFirstRun = true;
     int processID;
     

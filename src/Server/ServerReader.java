@@ -35,6 +35,7 @@ public class ServerReader implements Runnable {
 //			}
 						
 			while (reading) {
+				
 				//Checks to see if there is a leader election in progress
 				if (!ConnectionManager.leaderFlag) {
 					

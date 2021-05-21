@@ -1,6 +1,8 @@
 package Server;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +20,7 @@ class ServerConnectionHandler implements Runnable {
 	String dateString;
 	String leaderMessage;
 	Socket clientSocket = null;
-	boolean running = true;
+	static boolean running = true;
 	boolean reboot = false;
 	static boolean justFinished = false;
 	boolean flushSent = false;
@@ -41,7 +43,7 @@ class ServerConnectionHandler implements Runnable {
 				if(ConnectionManager.leaderFlag) {
 		
 					if (justFinished) {
-						System.out.println("In just finished loop");
+						//System.out.println("In just finished loop");
 						ConnectionManager.leaderFlag = false;
 						
 					} else {
@@ -87,20 +89,29 @@ class ServerConnectionHandler implements Runnable {
 		            						flushSent = true;
 		            						
 		            						if (ConnectionManager.numberOfFlushes == ConnectionManager.SecondList.size()) {
+		            							ConnectionManager.numberOfFlushes = 0;
 		            							ConnectionManager.leaderFlag = false;
 		            							ConnectionManager.electionComplete = true;
-		            							ConnectionManager.StartUp();
+		            							ConnectionManager.ServerBoot();
 		            						}
 		            					} else {
 		            						
 		            						System.out.println("Retiring from election in Server with process ID " + ConnectionManager.processID);
+		            						ConnectionManager.numberOfFlushes = 0;
 		        							ConnectionManager.leaderFlag = false;
 		        							ServerReader.reading = false;
 		        							justFinished = true;
 		            					}
 		            				}
 		            			}	            			 
-		            		}			            		
+		            		}	
+		            		if (inputString.startsWith("COMPLETE")) {
+		            			ConnectionManager.numberOfFlushes = 0;
+    							ConnectionManager.leaderFlag = false;
+    							ServerReader.reading = false;
+    							justFinished = true;
+    							ConnectionManager.Reboot();	
+		            		}
 	            		}	
 					}
 				} else {
@@ -147,7 +158,7 @@ class ServerConnectionHandler implements Runnable {
 	            			System.out.println("Beginning reboot..." + justFinished);
 	            			ConnectionManager.Reboot();	            			
 	            		}
-	            	}				
+	            	}
 				}	
 			}
 		} catch(Exception except) {

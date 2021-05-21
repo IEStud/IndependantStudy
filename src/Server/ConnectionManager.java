@@ -1,4 +1,6 @@
 package Server;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.net.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,20 +21,28 @@ public class ConnectionManager {
 	static boolean electionComplete = false;
 	static boolean already = false;
 	static boolean election = false;
-	
+	static boolean running = true;
+	static boolean timerLoop = true;
 	
 
-	public static void StartUp() throws InterruptedException {  	
-		boolean running = true;
+	public static void StartUp() throws InterruptedException {  
+		
+		TimerThread timerThread = new TimerThread();
+        Thread timerThread1 = new Thread(timerThread);
+        timerThread1.start();
+		
+		ServerBoot();
+	}
+	
+	public static void ServerBoot () throws InterruptedException {
+		
 		//GetFreePort tests ports from 50000 and up to find out which one is available
 		GetFreePort port = new GetFreePort();
 		PeerList.add(portNumber);
 		finalPort = port.GetPort(portNumber);		
 		oldPortNumber = finalPort;
 		amLeader = AmLeader();
-		
-		
-		
+				
     	if (amLeader) {
     		//If the node is the leader, it will only start up its server side
     		ServerStart(); 
@@ -45,8 +55,7 @@ public class ConnectionManager {
     			
     				ReaderWriter(newPort);
     				
-    			}
-    			
+    			}   			
     		}
     				
     	} else {    		
@@ -56,13 +65,16 @@ public class ConnectionManager {
     	}
     	
     	if (amLeader) {
+    		
 	    	while (running) {
+	    		
 	    		if (!leaderFlag) {
 	    			
 	    			Thread.sleep(12000);
 	    			UpdatePortList();
 	    			
 	    		} else if (leaderFlag) {
+	    			
 	    			running = false;
 	    		}
 	    	}
