@@ -28,11 +28,6 @@ public class ServerReader implements Runnable {
 				reading = false;
 				
 			}
-			
-//			if (ConnectionManager.election) {
-//				ConnectionManager.leaderFlag = true;
-//				System.out.println("The Leader flag is " + ConnectionManager.leaderFlag);
-//			}
 						
 			while (reading) {
 				
@@ -59,6 +54,12 @@ public class ServerReader implements Runnable {
 									if (result == 1) {
 										ConnectionManager.PeerList.add(add);
 									}
+								}
+								if (entry.startsWith("9")) {
+									int temp = Integer.parseInt(entry);
+									temp = temp - 90;
+									ConnectionManager.electionCount = temp;
+									System.out.println("The current election count is " + ConnectionManager.electionCount);
 								}
 							}							
 							System.out.println("HEARTBEAT : The Leader Flag is " + ConnectionManager.leaderFlag + " : And the Election boolean is " + ConnectionManager.electionComplete);

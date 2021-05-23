@@ -11,8 +11,8 @@ public class TimerThread implements Runnable {
 		RuntimeMXBean rb = ManagementFactory.getRuntimeMXBean();
 		Random rand = new Random();
 		int decider = 3;
-		int band1Upper = 5000;
-		int band2Upper = 10000;
+		int band1Upper = 120000;
+		int band2Upper = 240000;
 		int runningTime = 0;
 		int uptime;
 		int bandDecider;
@@ -46,6 +46,16 @@ public class TimerThread implements Runnable {
 			uptime = (int) rb.getUptime();
 			
 			if (uptime >= runningTime) {
+				
+				if (ConnectionManager.leaderFlag == true) {
+					
+					try {
+						Thread.sleep(20000);
+					} catch (InterruptedException e) {
+						System.out.println("Error in TimerThread ->" + e.getMessage());
+					}
+					
+				}
 				
 				System.out.println("Node crashing...");
 				System.exit(0);

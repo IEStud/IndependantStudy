@@ -1,6 +1,4 @@
 package Server;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 import java.net.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,6 +14,7 @@ public class ConnectionManager {
 	static int oldPortNumber;
 	static String serverIP = "localhost"; 
 	public static int finalPort;
+	static int electionCount = -1; //Start at -1 because each time a new leader starts its server, the count is increased be +1
 	static boolean amLeader;
 	static boolean leaderFlag = false;
 	static boolean electionComplete = false;
@@ -46,7 +45,7 @@ public class ConnectionManager {
     	if (amLeader) {
     		//If the node is the leader, it will only start up its server side
     		ServerStart(); 
-    		
+    		electionCount ++;
     		if (electionComplete) {
     			
     			election = false;

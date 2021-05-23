@@ -144,8 +144,8 @@ class ServerConnectionHandler implements Runnable {
 	            			
 	            			//This gets the list of clients the leader is aware of and send then back to the node
 	            			String temp = GetCurrentPortList();
-	
-	            			dataOut.writeUTF(temp + dateString);
+	            			int temp1 = ConnectionManager.electionCount + 90;
+	            			dataOut.writeUTF(temp + ":" + temp1);
 	            			dataOut.flush();	            			
 	            		}  
 	            		if (inputString.startsWith("ELECTION")) {
