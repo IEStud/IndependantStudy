@@ -18,7 +18,7 @@ public class ConnectionManager {
 	static boolean amLeader;
 	static boolean leaderFlag = false;
 	static boolean electionComplete = false;
-	static boolean already = false;
+	//static boolean already = false;
 	static boolean election = false;
 	static boolean running = true;
 	static boolean timerLoop = true;
@@ -69,7 +69,7 @@ public class ConnectionManager {
 	    		
 	    		if (!leaderFlag) {
 	    			
-	    			Thread.sleep(12000);
+	    			Thread.sleep(4000);
 	    			UpdatePortList();
 	    			
 	    		} else if (leaderFlag) {

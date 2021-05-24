@@ -59,10 +59,10 @@ public class ServerReader implements Runnable {
 									int temp = Integer.parseInt(entry);
 									temp = temp - 90;
 									ConnectionManager.electionCount = temp;
-									System.out.println("The current election count is " + ConnectionManager.electionCount);
+									//System.out.println("The current election count is " + ConnectionManager.electionCount);
 								}
 							}							
-							System.out.println("HEARTBEAT : The Leader Flag is " + ConnectionManager.leaderFlag + " : And the Election boolean is " + ConnectionManager.electionComplete);
+							//System.out.println("HEARTBEAT : The Leader Flag is " + ConnectionManager.leaderFlag + " : And the Election boolean is " + ConnectionManager.electionComplete);
 						}
 						if (dataFromServer.startsWith("ELECTION")) {
 							ConnectionManager.leaderFlag = true;

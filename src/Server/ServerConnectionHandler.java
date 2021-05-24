@@ -121,7 +121,7 @@ class ServerConnectionHandler implements Runnable {
 	            		inputString = dataIn.readUTF();
 	            		inputString = inputString.toUpperCase();
 	            		
-	            		System.out.println("Server: " + inputString);
+	            		//System.out.println("Server: " + inputString);
 	            		
 	            		//This first statement parses the port number presented after the CONNECT and stores it
 	            		if (inputString.startsWith("CONNECT")) {            			

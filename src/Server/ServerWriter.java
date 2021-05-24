@@ -27,16 +27,11 @@ public class ServerWriter implements Runnable {
 			String election = "ELECTION";
 			String complete = "COMPLETE";
 			
-//			if (ConnectionManager.election) {
-//				ConnectionManager.leaderFlag = true;
-//				System.out.println("The leader flag is " + ConnectionManager.leaderFlag);
-//			}
-			
 			if (ConnectionManager.electionComplete) {
 				System.out.println("Waiting for complete message send");
 				//Clear the peer list below to get a fresh list of online nodes
 				ConnectionManager.PeerList.clear();
-				Thread.sleep(10000);
+				Thread.sleep(5000);
 				dataOut.writeUTF(complete);
 				dataOut.flush();
 				ConnectionManager.electionComplete = false;
@@ -64,7 +59,7 @@ public class ServerWriter implements Runnable {
 							//Sends a heart beat check to the current leader every 10 seconds		
 							
 							if (swSocket.getPort() == 50000) {
-								Thread.sleep(10000);
+								Thread.sleep(2000);
 								dataOut.writeUTF(heartbeat + ConnectionManager.finalPort);
 								dataOut.flush();
 								ConnectionManager.electionComplete = false;
