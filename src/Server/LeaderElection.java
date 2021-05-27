@@ -13,12 +13,12 @@ public class LeaderElection {
 			
 			int uptime;
 			
-//			RuntimeMXBean rb = ManagementFactory.getRuntimeMXBean();
-//			uptime = (int) rb.getUptime();
+			RuntimeMXBean rb = ManagementFactory.getRuntimeMXBean();
+			uptime = (int) rb.getUptime();
 						
-			Random rand = new Random();
-			int upperBound = 1000;			
-			uptime = rand.nextInt(upperBound);
+//			Random rand = new Random();
+//			int upperBound = 1000;			
+//			uptime = rand.nextInt(upperBound);
 			
 			ConnectionManager.processID = uptime;
 			firstRun = false;
