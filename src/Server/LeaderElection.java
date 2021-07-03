@@ -19,7 +19,7 @@ public class LeaderElection {
 //			Random rand = new Random();
 //			int upperBound = 1000;			
 //			uptime = rand.nextInt(upperBound);
-			
+			 
 			ConnectionManager.processID = uptime;
 			firstRun = false;
 		}
